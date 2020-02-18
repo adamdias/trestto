@@ -15,15 +15,15 @@ describe('Task', () => {
       .post('/v1/tasks')
       .send(task);
 
-    console.log(response.body);
-
     expect(response.status).toBe(201);
     expect(response.body).toHaveProperty('id');
     expect(response.body).toHaveProperty('title');
     expect(response.body).toHaveProperty('description');
     expect(response.body).toHaveProperty('createdAt');
     expect(response.body).toHaveProperty('updatedAt');
-    expect(response.body).toHaveProperty('tags');
+    expect(response.body).toHaveProperty('Tags');
+    expect(response.body.Tags[0]).toHaveProperty('id');
+    expect(response.body.Tags[0]).toHaveProperty('title');
   });
 
   it('should be not able to create task without title', async () => {
@@ -34,72 +34,158 @@ describe('Task', () => {
     expect(response.status).toBe(400);
   });
 
-  // it('should be not able to register with duplicated nickname', async () => {
-  //   const user_1 = await factory.attrs('User', {
-  //     email: 'testin@test.com',
-  //     nickname: 'testing',
-  //   });
+  it('should be not able to create task with invalid tag', async () => {
+    const response = await request(app)
+      .post('/v1/tasks')
+      .send({
+        title: 'Test',
+        description: 'Testing',
+        tags: [{ name: 'name' }],
+      });
 
-  //   const user_2 = await factory.attrs('User', {
-  //     nickname: 'testing',
-  //   });
+    expect(response.status).toBe(400);
+  });
 
-  //   await request(app)
-  //     .post('/v1/users')
-  //     .send(user_1);
+  it('should be not able to create task without array tags', async () => {
+    const response = await request(app)
+      .post('/v1/tasks')
+      .send({
+        title: 'Test',
+        description: 'Testing',
+        tags: 'tag',
+      });
 
-  //   const response = await request(app)
-  //     .post('/v1/users')
-  //     .send(user_2);
+    expect(response.status).toBe(400);
+  });
 
-  //   expect(response.status).toBe(401);
-  // });
+  it('should be not able to create task with invalid description', async () => {
+    const response = await request(app)
+      .post('/v1/tasks')
+      .send({
+        title: 'Test',
+        description: {},
+        tags: 'tag',
+      });
 
-  // it('nickname should be not a number', async () => {
-  //   const user = await factory.attrs('User', {
-  //     nickname: '123',
-  //   });
+    expect(response.status).toBe(400);
+  });
 
-  //   const response = await request(app)
-  //     .post('/v1/users')
-  //     .send(user);
+  it('should be able to update task', async () => {
+    const task = await factory.attrs('Task');
 
-  //   expect(response.status).toBe(400);
-  // });
+    const created = await request(app)
+      .post('/v1/tasks')
+      .send(task);
 
-  // it('email should be not valid', async () => {
-  //   const user = await factory.attrs('User', {
-  //     email: '89asda@ttttttt',
-  //   });
+    const response = await request(app)
+      .put(`/v1/tasks/${created.body.id}`)
+      .send(task);
 
-  //   const response = await request(app)
-  //     .post('/v1/users')
-  //     .send(user);
+    expect(response.status).toBe(201);
+    expect(response.body).toHaveProperty('id');
+    expect(response.body).toHaveProperty('title');
+    expect(response.body).toHaveProperty('description');
+    expect(response.body).toHaveProperty('createdAt');
+    expect(response.body).toHaveProperty('updatedAt');
+    expect(response.body).toHaveProperty('Tags');
+    expect(response.body.Tags[0]).toHaveProperty('id');
+    expect(response.body.Tags[0]).toHaveProperty('title');
+    expect(response.body.Tags[0].title).toBe('Web');
+  });
 
-  //   expect(response.status).toBe(400);
-  // });
+  it('should be not able to update task with not exists id', async () => {
+    const task = await factory.attrs('Task');
 
-  // it('should be show a user by nickname', async () => {
-  //   const user = await factory.attrs('User');
+    const response = await request(app)
+      .put('/v1/tasks/7')
+      .send(task);
 
-  //   const created = await request(app)
-  //     .post('/v1/users')
-  //     .send(user);
+    expect(response.status).toBe(404);
+  });
 
-  //   const response = await request(app).get(
-  //     `/v1/users/nickname/${created.body.nickname}`
-  //   );
+  it('should be not able to update task without title', async () => {
+    const response = await request(app)
+      .put('/v1/tasks/7')
+      .send({ title: '' });
 
-  //   expect(response.status).toBe(200);
-  //   expect(response.body).toHaveProperty('id');
-  //   expect(response.body).toHaveProperty('first_name');
-  //   expect(response.body).toHaveProperty('last_name');
-  //   expect(response.body).toHaveProperty('email');
-  //   expect(response.body).toHaveProperty('nickname');
-  //   expect(response.body).toHaveProperty('bio');
-  //   expect(response.body).toHaveProperty('github');
-  //   expect(response.body).toHaveProperty('linkedin');
-  //   expect(response.body).toHaveProperty('objective');
-  //   expect(response.body.password_hash).toBeUndefined();
-  // });
+    expect(response.status).toBe(400);
+  });
+
+  it('should be not able to update task with invalid tag', async () => {
+    const response = await request(app)
+      .put('/v1/tasks/7')
+      .send({
+        title: 'Test',
+        description: 'Testing',
+        tags: [{ name: 'name' }],
+      });
+
+    expect(response.status).toBe(400);
+  });
+
+  it('should be not able to update task without array tags', async () => {
+    const response = await request(app)
+      .put('/v1/tasks/7')
+      .send({
+        title: 'Test',
+        description: 'Testing',
+        tags: 'tag',
+      });
+
+    expect(response.status).toBe(400);
+  });
+
+  it('should be not able to update task with invalid description', async () => {
+    const response = await request(app)
+      .put('/v1/tasks/7')
+      .send({
+        title: 'Test',
+        description: {},
+        tags: 'tag',
+      });
+
+    expect(response.status).toBe(400);
+  });
+
+  it('should be return all tasks', async () => {
+    const task = await factory.attrs('Task');
+
+    await request(app)
+      .post('/v1/tasks')
+      .send(task);
+
+    await request(app)
+      .post('/v1/tasks')
+      .send(task);
+
+    const response = await request(app).get('/v1/tasks');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('items');
+    expect(response.body.items[0]).toHaveProperty('title');
+    expect(response.body.items[0]).toHaveProperty('description');
+    expect(response.body.items[0]).toHaveProperty('createdAt');
+    expect(response.body.items[0]).toHaveProperty('updatedAt');
+    expect(response.body.items[0]).toHaveProperty('Tags');
+    expect(response.body.items[0].Tags[0]).toHaveProperty('id');
+    expect(response.body.items[0].Tags[0]).toHaveProperty('title');
+  });
+
+  it('should be able to delete task', async () => {
+    const task = await factory.attrs('Task');
+
+    const created = await request(app)
+      .post('/v1/tasks')
+      .send(task);
+
+    const response = await request(app).delete(`/v1/tasks/${created.body.id}`);
+
+    expect(response.status).toBe(204);
+  });
+
+  it('should be not able to delete task with id not exists', async () => {
+    const response = await request(app).delete('/v1/tasks/7');
+
+    expect(response.status).toBe(404);
+  });
 });

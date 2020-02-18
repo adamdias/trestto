@@ -1,5 +1,5 @@
 {
-  "name": "ead-api",
+  "name": "todolist-api",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",

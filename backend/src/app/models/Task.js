@@ -6,6 +6,8 @@ class Task extends Model {
       {
         id: {
           type: Sequelize.INTEGER,
+          allowNull: false,
+          autoIncrement: true,
           primaryKey: true,
         },
         title: Sequelize.STRING,
@@ -17,6 +19,10 @@ class Task extends Model {
     );
 
     return this;
+  }
+
+  static associate(models) {
+    this.hasMany(models.Tag);
   }
 }
 

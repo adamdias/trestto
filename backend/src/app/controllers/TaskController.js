@@ -10,14 +10,85 @@ class TaskController {
       const task = await Task.create({ title, description });
 
       if (tags) {
-        Promise.all([
+        await Promise.all(
           tags.map(async tag => {
-            await Tag.create({ title: tag, task_id: task.id });
-          }),
-        ]);
+            await Tag.create({
+              title: tag,
+              task_id: task.id,
+            });
+          })
+        );
       }
 
-      return res.status(201).json({ ...task.toJSON(), tags });
+      const findTask = await Task.findByPk(task.id, {
+        include: [
+          {
+            model: Tag,
+            attributes: ['id', 'title'],
+          },
+        ],
+      });
+
+      return res.status(201).json(findTask);
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async update(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { title, description, tags } = req.body;
+
+      const task = await Task.findByPk(id);
+
+      if (!task) {
+        throw new SendError('Not Found', 'Not found task', 404);
+      }
+
+      task.update({ title, description });
+
+      if (tags) {
+        await Tag.destroy({ where: { task_id: id } });
+
+        await Promise.all(
+          tags.map(async tag => {
+            await Tag.create({
+              title: tag,
+              task_id: id,
+            });
+          })
+        );
+      }
+
+      const findTask = await Task.findByPk(id, {
+        include: [
+          {
+            model: Tag,
+            attributes: ['id', 'title'],
+          },
+        ],
+      });
+
+      return res.status(201).json(findTask);
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async delete(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const task = await Task.findByPk(id);
+
+      if (!task) {
+        throw new SendError('Not Found', 'Not found task', 404);
+      }
+
+      await Task.destroy({ where: { id } });
+
+      return res.status(204).json();
     } catch (error) {
       return next(error);
     }
@@ -25,9 +96,17 @@ class TaskController {
 
   async index(req, res, next) {
     try {
-      const tasks = await Task.find();
+      const tasks = await Task.findAll({
+        order: [['createdAt', 'DESC']],
+        include: [
+          {
+            model: Tag,
+            attributes: ['id', 'title'],
+          },
+        ],
+      });
 
-      return res.json(tasks);
+      return res.json({ items: tasks });
     } catch (error) {
       return next(error);
     }

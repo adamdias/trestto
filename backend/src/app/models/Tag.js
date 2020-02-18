@@ -1,9 +1,15 @@
-import { Model, Sequelize } from 'sequelize';
+import Sequelize, { Model } from 'sequelize';
 
 class Tag extends Model {
   static init(sequelize) {
     super.init(
       {
+        id: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+          autoIncrement: true,
+          primaryKey: true,
+        },
         title: Sequelize.STRING,
       },
       {

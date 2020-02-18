@@ -1,0 +1,21 @@
+### Update task by id [PUT /v1/task/{id}]
+Update task by id
+
++ Parameters
+    + id: 12 (number) - The id of the task.
+
++ Request (application/json)
+    + Attributes
+        <!-- include(../../requests/TaskStore.apib) -->
+
++ Response 200 (application/json)
+    + Attributes
+        <!-- include(../../responses/TaskStore.apib) -->
+
++ Response 404 (application/json)
+    + Attributes
+        <!-- include(../../util/errorNotFound.apib) -->
+
++ Response 400 (application/json)
+    + Attributes
+        <!-- include(../../util/errorValidation.apib) -->

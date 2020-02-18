@@ -2,31 +2,37 @@
 
 API do teste proposto pela empresa TRESTTO
 
+# Requisitos
+
+- NODEJS (v10)
+- YARN
+- POSTGRESQL
+
 # Como instalar
 
-- Passo 1:
+### Passo 1:
 
 `cp .env.example .env`
 
-- Passo 2:
+### Passo 2:
 
 Informar corretamente todas as variaveís de ambiente
 
-- Passo 3:
+### Passo 3:
 
 `yarn`
 
-- Passo 4:
+### Passo 4:
 
 `yarn migrate`
 
-- Passo 5:
+### Passo 5:
 
 `yarn test`
 
 Ao rodar esse comando todos os teste devem passar
 
-- Passo 6:
+### Passo 6:
 
 `yarn dev`
 
